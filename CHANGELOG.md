@@ -1,5 +1,8 @@
 # Changelog
 
+## 2.1
+- Bouton « Installer l’application » sur l’accueil (Android/Chrome) ; consigne « Partager > Sur l’écran d’accueil » sur iPhone ; masqué une fois installée
+
 ## 2.0
 - Version installable (PWA) : manifeste, icônes, hors ligne
 - Code séparé en index.html / style.css / i18n.js / app.js

@@ -46,7 +46,7 @@ const a=$("#app");
 if(view==="stat"){a.innerHTML=statsHTML();return}
 if(view==="hist"){a.innerHTML=histHTML();return}
 if(res){a.innerHTML=`<div class="card res"><h1>${res.mode==="free"||res.mode==="ex"?t("sess"):t("won")}</h1><div class="big">${res.ex?Math.round(res.ex.hits/res.ex.n*100)+" %":fmt(res.avg)}</div><div class="cap">${res.ex?t("ex_"+res.ex.id)+" · "+res.ex.hits+"/"+res.ex.n:t("avg")+" · "+res.darts+" "+t("darts")}</div><p ${res.ex?"hidden":""}>${res.mode==="301"||res.mode==="501"?t("fin")+" "+res.fin+" · ":""}${t("hv")} ${res.best}<br>180 : ${res.v180} · 140+ : ${res.v140} · 100+ : ${res.v100}<br>${t("dh")} ${res.dh} · ${t("th")} ${res.th}</p>${res.pos&&res.pos.length?boardSVG(res.pos)+mapStats(res.pos):""}${bilan(res)}<button class="pri" data-a="v" data-v="play" data-r="1" style="width:100%">${t("again")}</button></div>`;return}
-if(!g){a.innerHTML=`<h1>${t("title")}</h1><div class="modes"><button data-a="s" data-mode="301">301</button><button data-a="s" data-mode="501">501</button><button class="free" data-a="s" data-mode="free">${t("free")}<small>${t("freeD")}</small></button></div><label class="chk"><input type="checkbox" data-a="do" ${dout?"checked":""}> ${t("dout")}</label>${homeExtra()}`;return}
+if(!g){a.innerHTML=`<h1>${t("title")}</h1>${installCard()}<div class="modes"><button data-a="s" data-mode="301">301</button><button data-a="s" data-mode="501">501</button><button class="free" data-a="s" data-mode="free">${t("free")}<small>${t("freeD")}</small></button></div><label class="chk"><input type="checkbox" data-a="do" ${dout?"checked":""}> ${t("dout")}</label>${homeExtra()}`;return}
 const x=derive(g),free=g.mode==="free",ex=g.mode==="ex",E=ex?exInfo(g):null,h=free||ex?null:co(x.rem),n=g.all.length,avg=n?x.pts/n*3:0,lv=x.vis[x.vis.length-1];
 let sl="";for(let i=0;i<3;i++){const d=x.cur[i];sl+=`<span class="${d?"f":""}">${d?lab(d):""}</span>`}
 if(!x.cur.length&&lv&&lv.bust)sl=`<span class="f" style="color:var(--rd);flex:3">${t("bust")}</span>`;
@@ -128,6 +128,7 @@ else if(a==="u"){g.all.pop();draw()}
 else if(a==="e")finish()
 else if(a==="sf"){sf=b.dataset.f;draw()}
 else if(a==="hq"){hq=b.dataset.f;draw()}
+else if(a==="inst"&&dip){dip.prompt();dip.userChoice.finally(()=>{dip=null;draw()})}
 else if(a==="im"){inm=inm==="tg"?"kb":"tg";sv("dk_in",inm);draw()}
 else if(a==="q"){if(qt){g=null;qt=false;draw()}else{qt=true;draw();setTimeout(()=>{qt=false;if(g)draw()},3000)}}
 else if(a==="x"){const i=+b.dataset.i;if(qtm===i){hist.splice(i,1);sv("dk_hist",hist);qtm=null;draw()}else{qtm=i;draw();setTimeout(()=>{qtm=null;if(view==="hist")draw()},3000)}}});
@@ -151,3 +152,12 @@ document.addEventListener("change",e=>{if(e.target.dataset.a==="do"){dout=e.targ
 draw();
 
 if("serviceWorker" in navigator&&location.protocol.startsWith("http"))addEventListener("load",()=>navigator.serviceWorker.register("sw.js").catch(()=>{}));
+
+var dip=null;
+function standalone(){return matchMedia("(display-mode: standalone)").matches||navigator.standalone}
+addEventListener("beforeinstallprompt",e=>{e.preventDefault();dip=e;draw()});
+addEventListener("appinstalled",()=>{dip=null;draw()});
+function installCard(){if(standalone())return"";
+if(dip)return`<button class="pri" data-a="inst" style="width:100%;margin:0 0 14px">${t("inst")}</button>`;
+if(/iphone|ipad|ipod/i.test(navigator.userAgent))return`<div class="card"><b>${t("inst")}</b><br><span class="cap">${t("insti")}</span></div>`;
+return""}
